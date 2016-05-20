@@ -35,13 +35,13 @@ var_cwd =  os.getcwd()
 __doc__ = """
 XtremIOSnap
 
-Version 3.0
+Version 3.2
 
 Usage:
     XtremIOSnap -h | --help
     XtremIOSnap (--encode) XMS_USER XMS_PASS [--l=<log_path>] [--debug]
-    XtremIOSnap XMS_IP XMS_USER XMS_PASS [--e]  [(--f --snap=<object_to_snap>)] [--n=<number_of_snaps>] [--schedule=<schedule>] [--tf=<target_folder>] [--l=<log_path>] [--debug]
-    XtremIOSnap XMS_IP XMS_USER XMS_PASS [--e]  [(--v --snap=<object_to_snap>)] [--n=<number_of_snaps>] [--schedule=<schedule>] [--tf=<target_folder>] [--l=<log_path>] [--debug]
+    XtremIOSnap XMS_IP XMS_USER XMS_PASS [--e]  [(--f --snap=<object_to_snap>)] [--n=<number_of_snaps>] [--schedule=<schedule>] [--tf=<target_folder>] [--l=<log_path>] [--debug] [--cluster=<cluster>]
+    XtremIOSnap XMS_IP XMS_USER XMS_PASS [--e]  [(--v --snap=<object_to_snap>)] [--n=<number_of_snaps>] [--schedule=<schedule>] [--tf=<target_folder>] [--l=<log_path>] [--debug] [--cluster=<cluster>]
 
 Create and maintain snapshots of both volumes and folders on an XtremIO array
 utilizing the REST API interface.  Designed and tested for XtremIO v3.0+.
@@ -67,6 +67,9 @@ Options:
     --v                     Specify to signify the object to snap is a volume.
 
     --snap=<object_to_snap> Object to snap, either a volume or folder
+
+    --cluster=<clustername> (Optional) Name of cluster on XMS where volumes are 
+                            to be snapped
 
     --n=<number_of_snaps>   Number of snapshots to retain [default: 5]
 
@@ -113,6 +116,7 @@ def main():
     parent_folder_id = main_options.var_snap_tgt_folder
     num_snaps = options['--n']
     snap_src = options['--snap']
+    clus_name = options['--cluster']
     SnapFolder = '_Snapshots'
     bool_create_folder = True ## will change to False if the /_Snapshots folder already exists
     rest = Restful(
@@ -120,7 +124,8 @@ def main():
         options['--debug'],
         XMS_IP,
         XMS_USER,
-        XMS_PASS
+        XMS_PASS,
+        clus_name
         )
     folder_list = rest._get(
         '/api/json/types/volume-folders'

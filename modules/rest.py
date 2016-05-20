@@ -27,12 +27,15 @@ requests.packages.urllib3.disable_warnings()
 
 class Restful:
 
-    def __init__(self,logfile,debugmode,global_XMS_IP,global_XMS_USER,global_XMS_PASS):
+    def __init__(self,logfile,debugmode,global_XMS_IP,global_XMS_USER,global_XMS_PASS, clus_name=None):
 
         global rest_logger
         global XMS_IP
         global XMS_USERID
         global XMS_PASS
+
+        self.clus_name = clus_name
+
         if debugmode == True:
             rest_logger = Logger(logfile,logging.DEBUG,logging.INFO)
         else:
@@ -43,14 +46,23 @@ class Restful:
         XMS_USERID = global_XMS_USER
         XMS_PASS = global_XMS_PASS
 
+    def _get_request_url(self, XMS_URL):
+        if self.clus_name:
+            if "?" in XMS_URL:   # If we already are passing a querystring, 
+                XMS_URL += "&cluster-id=%s" % self.clus_name
+            else:
+                XMS_URL += "?cluster-id=%s" % self.clus_name
+
+        return "https://%s%s" % (XMS_IP, XMS_URL)            
 
     def _get(self,XMS_URL):
         rest_logger.debug('Starting _get module')
 
+        request_url = self._get_request_url(XMS_URL)
         try:
-            rest_logger.debug('_get - https://'+XMS_IP+XMS_URL)
+            rest_logger.debug('_get - '+request_url)
             resp = requests.get(
-                'https://'+XMS_IP+XMS_URL,
+                request_url, 
                 auth=HTTPBasicAuth(XMS_USERID,XMS_PASS),
                 verify=False
                 )
@@ -73,11 +85,13 @@ class Restful:
 
         j=json.loads(PAYLOAD)
 
+        request_url = self._get_request_url(XMS_URL)
+
         try:
-            rest_logger.debug('_post - https://'+XMS_IP+XMS_URL)
+            rest_logger.debug('_post - '+request_url)
             rest_logger.debug('_post - '+PAYLOAD)
             resp = requests.post(
-                'https://'+XMS_IP+XMS_URL,
+                request_url,
                 auth=HTTPBasicAuth(XMS_USERID,XMS_PASS),
                 verify=False,
                 json=j
@@ -101,15 +115,18 @@ class Restful:
 
         j=json.loads(PAYLOAD)
 
+        request_url = self._get_request_url(XMS_URL)
+
         try:
-            rest_logger.debug('_put - https://'+XMS_IP+XMS_URL)
+            rest_logger.debug('_put - '+request_url)
             rest_logger.debug('_put - '+PAYLOAD)
             resp = requests.put(
-                'https://'+XMS_IP+XMS_URL,
+                request_url,
                 auth=HTTPBasicAuth(XMS_USERID,XMS_PASS),
                 verify=False,
                 json=j
                 )
+
         except requests.exceptions.RequestException as e:
             rest_logger.error(e)
             sys.exit(1)
@@ -127,10 +144,12 @@ class Restful:
     def _delete(self,XMS_URL):
         rest_logger.debug('Starting _delete module')
 
+        request_url = self._get_request_url(XMS_URL)
+
         try:
-            rest_logger.debug('_delete - https://'+XMS_IP+XMS_URL)
+            rest_logger.debug('_delete - ' + request_url)
             resp = requests.delete(
-                'https://'+XMS_IP+XMS_URL,
+                request_url,
                 auth=HTTPBasicAuth(XMS_USERID,XMS_PASS),
                 verify=False
                 )

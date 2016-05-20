@@ -60,6 +60,9 @@ Options
     --v                     Specify to signify the object to snap is a volume.
 
     --snap=<object_to_snap> Object to snap, either a volume or folder
+    
+    --cluster=<clustername> Optional name of XtremIO cluster (primarily for multiple
+                            clusters attached to same XMS)
 
     --n=<number_of_snaps>   Number of snapshots to retain [default: 5]
 
@@ -68,7 +71,8 @@ Options
 
     --tf=<target_folder>    When specified, a _Snapshot subfolder will be created
                             in this folder.  If not used, snapshots will be saved
-                            in a _Snapshot folder at the root.
+                            in a _Snapshot folder at the root.  For XtremIO 4+, 
+                            this is the TAG that will be placed on the snapshot
 
     --l=<log_path>          [default: """+var_cwd+"""/XtremIOSnap.log]
 
@@ -124,7 +128,7 @@ Showing the snapshot hierarchy view with a mix of individual volume snaps and fo
 
 Contributing
 -----------
-Please contribute in any way to the project.  Specifically, normalizing differnet image sizes, locations, and intance types would be easy adds to enhance the usefulness of the project.
+Please contribute in any way to the project.  Specifically, normalizing differnet image sizes, locations, and instance types would be easy adds to enhance the usefulness of the project.
 
 
 Licensing
